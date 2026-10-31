@@ -528,7 +528,9 @@ def from_utrnet_directory(
         dos_totals = [dosage_lookup[(reg_name, p)][0] for p in populations if (reg_name, p) in dosage_lookup]
         dos_autrs = [dosage_lookup[(reg_name, p)][1] for p in populations if (reg_name, p) in dosage_lookup]
         if dos_totals:
-            d_tot, d_autr, d_miss = float(np.mean(dos_totals)), float(np.mean(dos_autrs)), False
+            d_tot = float(math.log1p(max(float(np.mean(dos_totals)), 0.0)))
+            d_autr = float(math.log1p(max(float(np.mean(dos_autrs)), 0.0)))
+            d_miss = False
         else:
             d_tot, d_autr, d_miss = 0.0, 0.0, True
 
@@ -751,7 +753,8 @@ def from_utrnet_directory(
             ev_fac = float(grp["evidence_factor"].max())
             acc_val, acc_miss = _safe_float(grp["accessibility"].dropna().mean() if "accessibility" in grp.columns else None)
             dos_vals = [dosage_lookup[(str(reg_name), p)][0] for p in populations if (str(reg_name), p) in dosage_lookup]
-            cis_prior = float(np.mean(dos_vals)) if dos_vals else float(grp["regulatory_site_id"].nunique())
+            raw_cis_prior = float(np.mean(dos_vals)) if dos_vals else float(grp["regulatory_site_id"].nunique())
+            cis_prior = float(math.log1p(max(raw_cis_prior, 0.0)))
             if strip_expression_from_candidate_edges:
                 iscore, iscore_miss = 0.0, True
             else:
@@ -1052,16 +1055,31 @@ def from_graphml(
     return data
 
 
-def merge_hetero_graphs(graphs: list[HeteroData], *, include_reverse_edges: bool = True) -> HeteroData:
+def merge_hetero_graphs(
+    graphs: list[HeteroData],
+    *,
+    include_reverse_edges: bool = True,
+    strip_gene_coupled_shared_node_features: bool = True,
+) -> HeteroData:
     """Merge multiple gene-level `HeteroData` graphs into a unified multi-gene `HeteroData` graph.
 
     Shared node types (`population`, `regulator`, `cpa_factor`) are deduplicated by stable `node_id`
-    with observed features averaged over non-missing entries.
+    with observed features averaged over non-missing entries. When merging multiple distinct genes
+    (`strip_gene_coupled_shared_node_features=True`), gene-specific APA summary features on shared
+    `population` nodes (`cols 2:5`) and gene-specific cis-dosage features on shared `regulator`
+    nodes (`cols 5:7`) are masked so shared nodes retain only intrinsic cell-population / regulator
+    attributes while gene-coupled quantities remain on `gene` nodes and `candidate_regulation` edges.
     """
     if not graphs:
         raise ValueError("Cannot merge an empty list of HeteroData graphs")
     if len(graphs) == 1:
         return graphs[0].clone()
+
+    unique_genes: set[str] = set()
+    for g in graphs:
+        if "gene" in g.node_types:
+            unique_genes.update(g["gene"].node_ids)
+    is_multi_gene = len(unique_genes) > 1
 
     merged = HeteroData()
     merged.schema_version = SCHEMA_VERSION
@@ -1125,6 +1143,17 @@ def merge_hetero_graphs(graphs: list[HeteroData], *, include_reverse_edges: bool
             extra_dict = {"regulator_classes": [extra_reg_cls.get(n, "RBP") for n in ordered_ids]}
 
         global_id_maps[ntype] = _set_node_store(merged, ntype, ordered_ids, feats_out, masks_out, extra=extra_dict)
+        if strip_gene_coupled_shared_node_features and is_multi_gene and ordered_ids:
+            if ntype == "population":
+                merged["population"].x = merged["population"].x.clone()
+                merged["population"].x_missing_mask = merged["population"].x_missing_mask.clone()
+                merged["population"].x[:, 2:5] = 0.0
+                merged["population"].x_missing_mask[:, 2:5] = True
+            elif ntype == "regulator":
+                merged["regulator"].x = merged["regulator"].x.clone()
+                merged["regulator"].x_missing_mask = merged["regulator"].x_missing_mask.clone()
+                merged["regulator"].x[:, 5:7] = 0.0
+                merged["regulator"].x_missing_mask[:, 5:7] = True
 
     # Merge forward edges and deduplicate by (src_idx, dst_idx)
     forward_etypes = [et for et in CANONICAL_EDGE_TYPES if not et[1].startswith("rev_")]

@@ -1,0 +1,23 @@
+{
+  "benchmark": "gemma-explanation-grounding/v0.1",
+  "fine_tuning_enabled": false,
+  "providers": [
+    {"provider_name": "deterministic_rule_baseline", "model_id": "rule-v0.1"},
+    {"provider_name": "ollama_gemma", "model_id": "gemma3:4b-it-q4_K_M"},
+    {"provider_name": "ollama_gemma", "model_id": "gemma4:latest"}
+  ],
+  "scenarios": [
+    "synthetic:SAT1:mono_vs_cd8",
+    "utrnet_contrast:SAT1:Classical monocytes_vs_Tem/Trm cytotoxic T cells",
+    "utrnet_contrast:CORO1B:Classical monocytes_vs_Tem/Trm cytotoxic T cells"
+  ],
+  "metrics": [
+    "evidence_reference_precision",
+    "evidence_reference_recall",
+    "direction_accuracy",
+    "epistemic_separation_accuracy",
+    "uncertainty_calibration_accuracy",
+    "unsupported_claim_detection_rate",
+    "hallucinated_reference_count"
+  ]
+}

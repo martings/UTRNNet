@@ -1,4 +1,13 @@
-"""Data contracts and schema validation for UTRNNet (`cell-regulatory-state/v0.1`)."""
+"""Data contracts and schema validation for UTRNNet (`cell-regulatory-state/v0.1`, `utrnet-graph/v0.1`, and `dengue-paired-longitudinal/v0.1`)."""
+from .dengue_longitudinal import (
+    CANONICAL_DENGUE_CONDITIONS,
+    DENGUE_CONTRACT_VERSION,
+    DengueContractValidationReport,
+    DengueContrastPairSpec,
+    DengueSampleStateRecord,
+    build_and_validate_dengue_contrast,
+    validate_dengue_longitudinal_cohort,
+)
 from .schema import (
     AMBIGUITY_STATUS_TO_CODE,
     CANONICAL_EDGE_TYPES,
@@ -15,11 +24,28 @@ from .schema import (
     ValidationReport,
     validate_cell_regulatory_state,
 )
+from .utrnet_graph_v0_1 import (
+    OPTIONAL_UPSTREAM_TABLES,
+    REQUIRED_UPSTREAM_TABLES,
+    UPSTREAM_SCHEMA_VERSION,
+    UPSTREAM_TO_EXPERIMENTAL_EDGE_MAP,
+    UPSTREAM_TO_EXPERIMENTAL_NODE_MAP,
+    SchemaCompatibilityReport,
+    UpstreamValidationReport,
+    validate_utrnet_graphml,
+    validate_utrnet_upstream_directory,
+    verify_upstream_to_cell_state_compatibility,
+)
 
 __all__ = [
     "AMBIGUITY_STATUS_TO_CODE",
+    "CANONICAL_DENGUE_CONDITIONS",
     "CANONICAL_EDGE_TYPES",
     "CODE_TO_AMBIGUITY_STATUS",
+    "DENGUE_CONTRACT_VERSION",
+    "DengueContractValidationReport",
+    "DengueContrastPairSpec",
+    "DengueSampleStateRecord",
     "EDGE_CATEGORIES",
     "EDGE_FEATURE_SCHEMAS",
     "EVIDENCE_TIER_FACTORS",
@@ -27,8 +53,20 @@ __all__ = [
     "ID_TO_EVIDENCE_TIER",
     "NODE_FEATURE_SCHEMAS",
     "NODE_TYPES",
+    "OPTIONAL_UPSTREAM_TABLES",
+    "REQUIRED_UPSTREAM_TABLES",
     "SCHEMA_VERSION",
     "SPAN_STATUS_TO_CODE",
+    "SchemaCompatibilityReport",
+    "UPSTREAM_SCHEMA_VERSION",
+    "UPSTREAM_TO_EXPERIMENTAL_EDGE_MAP",
+    "UPSTREAM_TO_EXPERIMENTAL_NODE_MAP",
+    "UpstreamValidationReport",
     "ValidationReport",
+    "build_and_validate_dengue_contrast",
     "validate_cell_regulatory_state",
+    "validate_dengue_longitudinal_cohort",
+    "validate_utrnet_graphml",
+    "validate_utrnet_upstream_directory",
+    "verify_upstream_to_cell_state_compatibility",
 ]

@@ -102,6 +102,19 @@ def test_target_masking_and_strict_leakage_protection(tmp_path: Path):
     assert torch.all(cand_bind.edge_attr[:, 3] == 0.0)
     assert torch.all(cand_bind.edge_attr_missing_mask[:, 3])
 
+    # 5. Verify indirect PAS-usage leakage path is guarded (survival_probability, cis-dosage, gene/pop APA summaries)
+    explicit_mask = {nt: torch.zeros_like(data[nt].x_missing_mask) for nt in data.node_types}
+    explicit_mask["pas"][0, 2] = True
+    pas_batch = apply_feature_mask_with_leakage_guard(data, mask_ratio=0.0, explicit_node_mask=explicit_mask)
+    assert torch.all(pas_batch.masked_data["regulatory_region"].x[:, 3] == 0.0)
+    assert torch.all(pas_batch.masked_data["regulatory_region"].x_missing_mask[:, 3])
+    assert torch.all(pas_batch.masked_data["regulator"].x[:, 5:7] == 0.0)
+    assert torch.all(pas_batch.masked_data["regulator"].x_missing_mask[:, 5:7])
+    assert torch.all(pas_batch.masked_data["gene"].x[:, 3:6] == 0.0)
+    assert torch.all(pas_batch.masked_data["gene"].x_missing_mask[:, 3:6])
+    assert torch.all(pas_batch.masked_data[("regulator", "candidate_regulation", "gene")].edge_attr[:, 0] == 0.0)
+    assert torch.all(pas_batch.masked_data[("regulator", "candidate_regulation", "gene")].edge_attr_missing_mask[:, 0])
+
 
 def test_negative_control_edge_randomization(tmp_path: Path):
     data = _build_synthetic_two_gene_graph(tmp_path)

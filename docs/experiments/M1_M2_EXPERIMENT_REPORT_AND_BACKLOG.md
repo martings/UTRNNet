@@ -2,52 +2,49 @@
 
 ## 1. Graph Construction Verification (`M1`)
 
-Using the `cell-regulatory-state/v0.1` adapter (`utrnnet.graphs.from_utrnet_directory` and `utrnnet.graphs.from_graphml`), frozen PBMC 1k (`pbmc_1k_v3`, 1,113 QC-passing cells across 16 curated cell types) outputs were converted and validated via `validate_cell_regulatory_state`:
+Using the `cell-regulatory-state/v0.1` adapter ([`utrnnet.graphs.from_utrnet_directory`](file:///scratch/users/megas/scPolASeq_downstream/UTRNNet/src/utrnnet/graphs/adapter.py#L151-L810) and [`utrnnet.graphs.from_graphml`](file:///scratch/users/megas/scPolASeq_downstream/UTRNNet/src/utrnnet/graphs/adapter.py#L813-L1055)) and the upstream contract verifier ([`verify_upstream_to_cell_state_compatibility`](file:///scratch/users/megas/scPolASeq_downstream/UTRNNet/src/utrnnet/contracts/utrnet_graph_v0_1.py#L244-L312)), frozen PBMC 1k (`pbmc_1k_v3`, 1,113 QC-passing cells across 16 curated cell types) outputs were converted and validated via [`validate_cell_regulatory_state`](file:///scratch/users/megas/scPolASeq_downstream/UTRNNet/src/utrnnet/contracts/schema.py#L199-L325):
 
 | Cohort / Gene | `population` | `gene` | `pas` | `utr_isoform` | `regulatory_region` | `regulator` | `cpa_factor` | Total Typed Edges | Schema Valid |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | :---: |
 | **`SAT1`** (`ENSG00000130066`) | 16 | 1 | 26 | 34 | 2,577 | 95 | 37 | 15,066 | `True` |
 | **`CORO1B`** (`ENSG00000172725`) | 16 | 1 | 10 | 17 | 4,333 | 192 | 36 | 24,654 | `True` |
-| **Merged 25-Gene PBMC1k Cohort** | 16 | 25 | 805 | 983 | 208,919 | 618 | 42 | 901,508 | `True` |
+| **Train Cohort (20 Genes Merged)** | 16 | 20 | 696 | 866 | 192,480 | 615 | 42 | 829,586 | `True` |
+| **Held-Out Test Cohort (5 Disjoint Genes)** | 16 | 5 | 109 | 117 | 16,439 | 386 | 40 | 84,178 | `True` |
 
 Key verified properties:
 - All 4 epistemic edge categories (`structural`, `annotation_derived`, `observed`, `inferred_candidate`) are preserved in separate PyG edge stores.
 - Endogenous miRNA regulators have `x_missing_mask[:, 0:2] == True` (`log1p_mean_umi_per_cell` and `abundance_factor` explicitly flagged as missing rather than imputed as zero).
 - Unresolved and model-dependent 3'UTR isoforms (`ambiguity_code` and `is_unresolved_mask`) are explicitly retained on `utr_isoform` nodes and `("pas", "defines_isoform", "utr_isoform")` edges.
+- Shared `population` and `regulator` nodes in multi-gene merged graphs mask gene-coupled summary features (`population.x[:, 2:5]` and `regulator.x[:, 5:7]`) so gene-specific APA and cis-dosage statistics never leak across genes.
 
 ---
 
-## 2. Masked Node-Feature Reconstruction Benchmark (`M2`)
+## 2. Masked Node-Feature Reconstruction Benchmark (`M2` Consolidated)
 
-All runs use `seed=42`, `hidden_channels=64`, `num_layers=2`, `heads=4`, `mask_ratio=0.25`, `lr=3e-3`, and strict topological anti-leakage sanitization (`apply_feature_mask_with_leakage_guard` + `verify_zero_target_leakage`).
+All runs use `seed=42`, `hidden_channels=64`, `num_layers=2`, `heads=4`, `mask_ratio=0.25`, `lr=3e-3`, `log1p`-scaled cis-dosage features, and strict direct + indirect topological anti-leakage sanitization ([`apply_feature_mask_with_leakage_guard`](file:///scratch/users/megas/scPolASeq_downstream/UTRNNet/src/utrnnet/graphs/leakage.py#L59-L265) + [`verify_zero_target_leakage`](file:///scratch/users/megas/scPolASeq_downstream/UTRNNet/src/utrnnet/evaluation/metrics.py#L46-L108)).
 
 ### 2.1 Exploratory Two-Gene Panel (`SAT1` + `CORO1B`, 25 Epochs on CUDA)
 
 | Model / Topology | Final Masked MSE | Final Masked MAE | Zero-Leakage Audit |
 | --- | ---: | ---: | :---: |
-| `TrivialNonGraphBaseline` (node-local MLP, no edges) | `4.7585` | `0.2653` | `True` |
-| `UTRNNetHeteroGNN` + **Randomized-Edge Negative Control** | `4.7092` | `0.2500` | `True` |
-| `UTRNNetHeteroGNN` + **True Regulatory Graph** | **`4.6716`** | **`0.2064`** | `True` |
+| `TrivialNonGraphBaseline` (node-local MLP, no edges) | `0.0485` | `0.1615` | `True` |
+| `UTRNNetHeteroGNN` + **Randomized-Edge Negative Control** | `0.0446` | `0.1510` | `True` |
+| **`UTRNNetHeteroGNN` + True Regulatory Graph** | **`0.0330`** | **`0.1169`** | `True` |
 
-### 2.2 Multi-Gene PBMC1k Cohort (25 QC-Passing APA Genes, 901,508 Typed Edges)
+### 2.2 Held-Out Inductive Gene Split (20 Train Genes $\rightarrow$ 5 Disjoint Unseen Test Genes) & Ablations
 
-#### Transductive Masked Feature Reconstruction (All 25 Genes Merged)
-
-| Model / Topology | Final Masked MSE | Final Masked MAE | Zero-Leakage Audit |
-| --- | ---: | ---: | :---: |
-| `TrivialNonGraphBaseline` (node-local MLP, no edges) | `0.3908` | `0.1683` | `True` |
-| `UTRNNetHeteroGNN` + **Randomized-Edge Negative Control** | `0.3886` | `0.1598` | `True` |
-| `UTRNNetHeteroGNN` + **True Regulatory Graph** | **`0.3719`** | **`0.1353`** | `True` |
-
-#### Held-Out Inductive Gene Split (20 Train Genes $\rightarrow$ 5 Unseen Test Genes)
-
-| Model / Test Topology | Held-Out Test MSE | Held-Out Test MAE | Relative MAE Change vs Baseline |
+| Model / Ablation Variant | Held-Out Test MSE | Held-Out Test MAE | Relative MSE Change vs Baseline |
 | --- | ---: | ---: | ---: |
-| `TrivialNonGraphBaseline` (node-local MLP, no edges) | `0.7190` | `0.2117` | `0.0%` |
-| `UTRNNetHeteroGNN` evaluated on **Randomized-Edge Negative Control** | `0.7862` | `0.2521` | `+19.1%` (degraded) |
-| `UTRNNetHeteroGNN` evaluated on **True Regulatory Graph** | **`0.6564`** | **`0.1634`** | **`-22.8%` (improved)** |
+| `TrivialNonGraphBaseline` (node-local MLP, no edges) | `0.0700` | `0.1797` | `0.0%` |
+| `UTRNNetHeteroGNN` evaluated on **Randomized-Edge Negative Control** | `0.0756` | `0.2018` | `+8.0%` (degraded) |
+| `UTRNNetHeteroGNN` (`structural + annotation_derived` only) | `0.0574` | `0.1601` | `-18.0%` |
+| `UTRNNetHeteroGNN` (no `inferred_candidate` edges) | `0.0614` | `0.1619` | `-12.3%` |
+| `UTRNNetHeteroGNN` (**Evidence Tiers Ablated** `use_evidence_tiers=False`) | `0.0602` | `0.1702` | `-14.0%` |
+| **`UTRNNetHeteroGNN` (Full 4 Edge Categories + Evidence Tiers)** | **`0.0521`** | **`0.1428`** | **`-25.6%` (improved)** |
 
-> **Scientific interpretation note:** These metrics demonstrate only that typed message passing over structural/annotation/observed/candidate graph topology improves held-out masked feature reconstruction relative to an edge-free MLP and a randomized-edge topology without target leakage. They do **not** validate physical RBP occupancy or causal regulatory dynamics.
+- **Resource footprint (25 genes + 6 models trained & evaluated):** `28.79 s` graph load, `63.88 s` total wall time, `4,741.62 MB` peak CUDA VRAM, `2,247.65 MB` peak CPU RSS.
+
+> **Scientific interpretation note:** These metrics demonstrate self-supervised masked feature reconstruction and inductive generalization across held-out gene subgraphs on static observational PBMC1k data. They do **not** represent perturbation response prediction (evaluated separately in `docs/experiments/TAHOE_PILOT_BENCHMARK.md`) or validate physical RBP occupancy.
 
 ---
 
@@ -56,22 +53,5 @@ All runs use `seed=42`, `hidden_channels=64`, `num_layers=2`, `heads=4`, `mask_r
 1. **Candidate sequence matches vs. physical occupancy:** ATtRACT RBP motif scans and MirGeneDB 7mer-m8 seed matches represent sequence-level priors (`inferred_candidate`), not cell-type-resolved physical binding. Direct eCLIP/CLIP-seq (e.g., ENCODE) integration is required to upgrade candidate edges to experimental occupancy tiers.
 2. **Unmeasured endogenous miRNA abundance:** 10x 3' scPolASeq captures polyadenylated mRNAs and does not measure mature miRNA levels. All miRNA nodes remain prior-only (`x_missing_mask[:, 0:2] = True`).
 3. **Transcript/PAS structural ambiguity:** Multiple GTF transcript models can share or split a Sierra PAS peak (`ambiguous_multiple_models`), and some intronic/proximal PAS peaks lack a compatible annotated terminal-exon 3'UTR (`no_compatible_3utr_model`).
-4. **Cohort size and single-donor PBMC 1k scope:** While 25 pre-built PBMC 1k APA genes (901,508 edges) were evaluated here and the loader supports 30–100+ genes, PBMC 1k is a single biological sampling context without donor replicates.
-5. **No continuous-time dynamics on static cell types:** Curated PBMC cell types are not temporal observations (`is_temporal_observation = False`). Longitudinal or perturbation modeling must wait for multi-timepoint / CRISPRi / RBP-knockdown datasets.
-
----
-
-## 4. Prioritized Issue Backlog
-
-- **Issue #1 (P0 — Next Recommended): Expand PBMC1k & Multi-Donor Cohort Cache to 50–100 Quality-Controlled APA Genes with Pre-Indexed GTF/FASTA Streaming**
-  - Pre-index GTF/Sierra tables once per cohort so `scpolaseq_utrnet.pipeline.build_gene_graphs` builds 100+ QC-passing APA genes in `< 30s`, and evaluate 5-fold cross-validation across gene families.
-- **Issue #2 (P1): Edge-Category Ablation & Relation-Specific Attention Attribution**
-  - Quantify the marginal reconstruction contribution of `structural` vs `annotation_derived` vs `observed` vs `inferred_candidate` edges by training `UTRNNetHeteroGNN` across subsets of `allowed_edge_categories`.
-- **Issue #3 (P1): ENCODE eCLIP / CLIP-seq Experimental Occupancy Tier Integration**
-  - Cross-reference `regulatory_region` genomic intervals against ENCODE eCLIP peaks (K562/HepG2/immune) to populate `experimental_other_context` and `experimental_matching_context` evidence tiers with measured peak scores.
-- **Issue #4 (P2): Out-of-Fold PAS Usage & Cis-Dosage Prediction Task (Strict Expression-Free Input Mode)**
-  - Train a dedicated head predicting population-specific PAS usage proportions (`pas_proportion`) from CPA factor expression, RBP abundance, and sequence/accessibility priors alone (`strip_expression_from_candidate_edges=True`).
-- **Issue #5 (P2): Validate `PerturbationConditionedHead` on Experimental RBP Knockdown / CRISPRi Perturb-seq Cohorts**
-  - Benchmark `UTRNNetHeteroGNN.predict_perturbation_delta` on experimental RBP knockdown datasets (e.g., ENCODE shRNA RNA-seq or Perturb-seq) before making any causal perturbation claims.
-- **Issue #6 (P3): Discrete Paired Longitudinal State-Transition Adapter (Dengue Day 1 $\rightarrow$ Week 2)**
-  - Extend `cell-regulatory-state/v0.1` to paired longitudinal cohorts (`is_temporal_observation = True`) using discrete paired transitions before considering any continuous-time neural ODE formulation.
+4. **Cohort size and single-donor PBMC 1k scope:** PBMC 1k is a single biological sampling context without donor replicates.
+5. **No continuous-time dynamics on static cell types:** Curated PBMC cell types are not temporal observations (`is_temporal_observation = False`).

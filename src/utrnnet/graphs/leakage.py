@@ -167,7 +167,9 @@ def apply_feature_mask_with_leakage_guard(
                         masked_data[etype].edge_attr_missing_mask[hit, :2] = True
                         sanitized_edges.append(etype)
 
-    # 3. PAS & UTR isoform usage leakage guard (pas cols 2,3,4 <-> utr_isoform col 2 <-> uses_isoform edges)
+    # 3. PAS & UTR isoform usage + coupled cis-survival / APA summary leakage guard
+    #    (pas cols 2:5 <-> utr_isoform col 2 <-> uses_isoform edges <-> regulatory_region col 3
+    #     <-> regulator cols 5:7 <-> candidate_regulation col 0 <-> gene cols 3:6 <-> population cols 2:5)
     pas_masked = (
         (reconstruction_mask["pas"][:, 2] | reconstruction_mask["pas"][:, 3] | reconstruction_mask["pas"][:, 4])
         if ("pas" in reconstruction_mask and reconstruction_mask["pas"].numel() > 0)
@@ -178,7 +180,30 @@ def apply_feature_mask_with_leakage_guard(
         if ("utr_isoform" in reconstruction_mask and reconstruction_mask["utr_isoform"].numel() > 0)
         else torch.zeros((0,), dtype=torch.bool)
     )
-    if bool(pas_masked.any()) or bool(iso_masked.any()):
+    surv_masked = (
+        reconstruction_mask["regulatory_region"][:, 3]
+        if ("regulatory_region" in reconstruction_mask and reconstruction_mask["regulatory_region"].numel() > 0)
+        else torch.zeros((0,), dtype=torch.bool)
+    )
+    cis_reg_masked = (
+        (reconstruction_mask["regulator"][:, 5] | reconstruction_mask["regulator"][:, 6])
+        if ("regulator" in reconstruction_mask and reconstruction_mask["regulator"].numel() > 0)
+        else torch.zeros((0,), dtype=torch.bool)
+    )
+    gene_apa_masked = (
+        (reconstruction_mask["gene"][:, 3] | reconstruction_mask["gene"][:, 4] | reconstruction_mask["gene"][:, 5])
+        if ("gene" in reconstruction_mask and reconstruction_mask["gene"].numel() > 0)
+        else torch.zeros((0,), dtype=torch.bool)
+    )
+
+    any_apa_or_usage_masked = (
+        bool(pas_masked.any())
+        or bool(iso_masked.any())
+        or bool(surv_masked.any())
+        or bool(cis_reg_masked.any())
+        or bool(gene_apa_masked.any())
+    )
+    if any_apa_or_usage_masked:
         # Propagate masking across ("pas", "defines_isoform", "utr_isoform")
         def_etype = ("pas", "defines_isoform", "utr_isoform")
         if def_etype in masked_data.edge_types and masked_data[def_etype].edge_index.numel() > 0:
@@ -218,6 +243,44 @@ def apply_feature_mask_with_leakage_guard(
                         masked_data[etype].edge_attr[hit, :3] = 0.0
                         masked_data[etype].edge_attr_missing_mask[hit, :3] = True
                         sanitized_edges.append(etype)
+
+        # Sanitize indirect PAS-proportion-derived summary features in model inputs (`masked_data`)
+        # so PAS/isoform usage cannot leak through survival_probability, cis-dosage, or gene/pop SI/magnetization.
+        if "regulatory_region" in masked_data.node_types and masked_data["regulatory_region"].x.numel() > 0:
+            masked_data["regulatory_region"].x = masked_data["regulatory_region"].x.clone()
+            masked_data["regulatory_region"].x_missing_mask = masked_data["regulatory_region"].x_missing_mask.clone()
+            masked_data["regulatory_region"].x[:, 3] = 0.0
+            masked_data["regulatory_region"].x_missing_mask[:, 3] = True
+
+        if "regulator" in masked_data.node_types and masked_data["regulator"].x.numel() > 0:
+            masked_data["regulator"].x = masked_data["regulator"].x.clone()
+            masked_data["regulator"].x_missing_mask = masked_data["regulator"].x_missing_mask.clone()
+            masked_data["regulator"].x[:, 5:7] = 0.0
+            masked_data["regulator"].x_missing_mask[:, 5:7] = True
+
+        if "gene" in masked_data.node_types and masked_data["gene"].x.numel() > 0:
+            masked_data["gene"].x = masked_data["gene"].x.clone()
+            masked_data["gene"].x_missing_mask = masked_data["gene"].x_missing_mask.clone()
+            masked_data["gene"].x[:, 3:6] = 0.0
+            masked_data["gene"].x_missing_mask[:, 3:6] = True
+
+        if "population" in masked_data.node_types and masked_data["population"].x.numel() > 0:
+            masked_data["population"].x = masked_data["population"].x.clone()
+            masked_data["population"].x_missing_mask = masked_data["population"].x_missing_mask.clone()
+            masked_data["population"].x[:, 2:5] = 0.0
+            masked_data["population"].x_missing_mask[:, 2:5] = True
+
+        for etype in [
+            ("regulator", "candidate_regulation", "gene"),
+            ("gene", "rev_candidate_regulation", "regulator"),
+        ]:
+            if etype in masked_data.edge_types and masked_data[etype].edge_attr.numel() > 0:
+                masked_data[etype].edge_attr = masked_data[etype].edge_attr.clone()
+                masked_data[etype].edge_attr_missing_mask = masked_data[etype].edge_attr_missing_mask.clone()
+                masked_data[etype].edge_attr[:, 0] = 0.0
+                masked_data[etype].edge_attr_missing_mask[:, 0] = True
+                if etype not in sanitized_edges:
+                    sanitized_edges.append(etype)
 
     return MaskedGraphBatch(
         masked_data=masked_data,

@@ -1,0 +1,532 @@
+{
+  "contract": "cell-regulatory-state/v0.1",
+  "source_dataset": "tahoebio/Tahoe-100M",
+  "source_revision": "349e2a55f5538a3e73b32a06c6bdd8e9e87011e8",
+  "selection_status": "metadata_selected_expression_validation_pending",
+  "metadata_scan": {
+    "config": "obs_metadata",
+    "rows_scanned": 100648790,
+    "pass_filter_full": 95624334,
+    "pass_filter_minimal": 5024456,
+    "sample_line_groups": 67043,
+    "unique_samples": 1344,
+    "cell_lines": 50,
+    "drug_labels": 380,
+    "dose_conditions": 1138
+  },
+  "selected_cell_lines": [
+    "CVCL_0399",
+    "CVCL_0459"
+  ],
+  "unique_perturbation_condition_n": 4,
+  "sample_is_replicate_unit": true,
+  "biological_replication_established": false,
+  "coverage_note": "n_cells counts obs_metadata rows across full and minimal pass_filter categories. Expression data contains full rows only; sample-line expression coverage must be validated before caching.",
+  "conditions": [
+    {
+      "cell_line_id": "CVCL_0399",
+      "drug": "Adagrasib",
+      "condition": "[('Adagrasib', 0.05, 'uM')]",
+      "perturbation_condition": "Adagrasib | [('Adagrasib', 0.05, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Adagrasib",
+          "concentration": 0.05,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1588",
+        "smp_1684",
+        "smp_1780",
+        "smp_1876",
+        "smp_1972",
+        "smp_2068",
+        "smp_2152",
+        "smp_2164",
+        "smp_2260",
+        "smp_2356",
+        "smp_2452",
+        "smp_2548",
+        "smp_2644",
+        "smp_2667",
+        "smp_2668",
+        "smp_2836"
+      ],
+      "control_samples": [
+        "smp_1589",
+        "smp_1590",
+        "smp_1685",
+        "smp_1686",
+        "smp_1781",
+        "smp_1782",
+        "smp_1877",
+        "smp_1878",
+        "smp_1973",
+        "smp_1974",
+        "smp_2069",
+        "smp_2070",
+        "smp_2165",
+        "smp_2166",
+        "smp_2261",
+        "smp_2262",
+        "smp_2357",
+        "smp_2358",
+        "smp_2453",
+        "smp_2454",
+        "smp_2549",
+        "smp_2550",
+        "smp_2645",
+        "smp_2646",
+        "smp_2669",
+        "smp_2670",
+        "smp_2837",
+        "smp_2838"
+      ],
+      "matched_plates": [
+        "plate1",
+        "plate10",
+        "plate11",
+        "plate12",
+        "plate13",
+        "plate14",
+        "plate2",
+        "plate3",
+        "plate4",
+        "plate5",
+        "plate6",
+        "plate7",
+        "plate8",
+        "plate9"
+      ],
+      "treatment_sample_n": 16,
+      "control_sample_n": 28,
+      "treatment_cell_n": 42861,
+      "control_cell_n": 74255,
+      "mean_gene_count": 1577.9091574954105,
+      "mean_pcnt_mito": 0.06484426401140489,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "LoVo",
+        "depmap_id": "ACH-000950",
+        "organ": "Bowel"
+      },
+      "drug_annotations_context_only": {
+        "targets": "KRAS",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "RAS inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    },
+    {
+      "cell_line_id": "CVCL_0459",
+      "drug": "Adagrasib",
+      "condition": "[('Adagrasib', 0.05, 'uM')]",
+      "perturbation_condition": "Adagrasib | [('Adagrasib', 0.05, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Adagrasib",
+          "concentration": 0.05,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1588",
+        "smp_1684",
+        "smp_1780",
+        "smp_1876",
+        "smp_1972",
+        "smp_2068",
+        "smp_2152",
+        "smp_2164",
+        "smp_2260",
+        "smp_2356",
+        "smp_2452",
+        "smp_2548",
+        "smp_2644",
+        "smp_2667",
+        "smp_2668",
+        "smp_2836"
+      ],
+      "control_samples": [
+        "smp_1589",
+        "smp_1590",
+        "smp_1685",
+        "smp_1686",
+        "smp_1781",
+        "smp_1782",
+        "smp_1877",
+        "smp_1878",
+        "smp_1973",
+        "smp_1974",
+        "smp_2069",
+        "smp_2070",
+        "smp_2165",
+        "smp_2166",
+        "smp_2261",
+        "smp_2262",
+        "smp_2357",
+        "smp_2358",
+        "smp_2453",
+        "smp_2454",
+        "smp_2549",
+        "smp_2550",
+        "smp_2645",
+        "smp_2646",
+        "smp_2669",
+        "smp_2670",
+        "smp_2837",
+        "smp_2838"
+      ],
+      "matched_plates": [
+        "plate1",
+        "plate10",
+        "plate11",
+        "plate12",
+        "plate13",
+        "plate14",
+        "plate2",
+        "plate3",
+        "plate4",
+        "plate5",
+        "plate6",
+        "plate7",
+        "plate8",
+        "plate9"
+      ],
+      "treatment_sample_n": 16,
+      "control_sample_n": 28,
+      "treatment_cell_n": 79205,
+      "control_cell_n": 131593,
+      "mean_gene_count": 1144.6995776815647,
+      "mean_pcnt_mito": 0.0701820396745549,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "NCI-H460",
+        "depmap_id": "ACH-000463",
+        "organ": "Lung"
+      },
+      "drug_annotations_context_only": {
+        "targets": "KRAS",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "RAS inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    },
+    {
+      "cell_line_id": "CVCL_0399",
+      "drug": "Afatinib",
+      "condition": "[('Afatinib', 0.5, 'uM')]",
+      "perturbation_condition": "Afatinib | [('Afatinib', 0.5, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Afatinib",
+          "concentration": 0.5,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1626",
+        "smp_2188",
+        "smp_2692"
+      ],
+      "control_samples": [
+        "smp_1685",
+        "smp_1686",
+        "smp_2261",
+        "smp_2262",
+        "smp_2669",
+        "smp_2670"
+      ],
+      "matched_plates": [
+        "plate13",
+        "plate2",
+        "plate8"
+      ],
+      "treatment_sample_n": 3,
+      "control_sample_n": 6,
+      "treatment_cell_n": 11216,
+      "control_cell_n": 18829,
+      "mean_gene_count": 1568.6387980037637,
+      "mean_pcnt_mito": 0.05663469564326224,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "LoVo",
+        "depmap_id": "ACH-000950",
+        "organ": "Bowel"
+      },
+      "drug_annotations_context_only": {
+        "targets": "EGFR, ERBB2",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "EGFR/ERBB inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    },
+    {
+      "cell_line_id": "CVCL_0459",
+      "drug": "Afatinib",
+      "condition": "[('Afatinib', 0.5, 'uM')]",
+      "perturbation_condition": "Afatinib | [('Afatinib', 0.5, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Afatinib",
+          "concentration": 0.5,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1626",
+        "smp_2188",
+        "smp_2692"
+      ],
+      "control_samples": [
+        "smp_1685",
+        "smp_1686",
+        "smp_2261",
+        "smp_2262",
+        "smp_2669",
+        "smp_2670"
+      ],
+      "matched_plates": [
+        "plate13",
+        "plate2",
+        "plate8"
+      ],
+      "treatment_sample_n": 3,
+      "control_sample_n": 6,
+      "treatment_cell_n": 21664,
+      "control_cell_n": 31926,
+      "mean_gene_count": 1259.1708481548155,
+      "mean_pcnt_mito": 0.06150748852264182,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "NCI-H460",
+        "depmap_id": "ACH-000463",
+        "organ": "Lung"
+      },
+      "drug_annotations_context_only": {
+        "targets": "EGFR, ERBB2",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "EGFR/ERBB inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    },
+    {
+      "cell_line_id": "CVCL_0399",
+      "drug": "Afatinib",
+      "condition": "[('Afatinib', 5.0, 'uM')]",
+      "perturbation_condition": "Afatinib | [('Afatinib', 5.0, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Afatinib",
+          "concentration": 5.0,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1722",
+        "smp_2284",
+        "smp_2680"
+      ],
+      "control_samples": [
+        "smp_1781",
+        "smp_1782",
+        "smp_2357",
+        "smp_2358",
+        "smp_2669",
+        "smp_2670"
+      ],
+      "matched_plates": [
+        "plate13",
+        "plate3",
+        "plate9"
+      ],
+      "treatment_sample_n": 3,
+      "control_sample_n": 6,
+      "treatment_cell_n": 6814,
+      "control_cell_n": 10152,
+      "mean_gene_count": 1478.860159082604,
+      "mean_pcnt_mito": 0.06207353681245705,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "LoVo",
+        "depmap_id": "ACH-000950",
+        "organ": "Bowel"
+      },
+      "drug_annotations_context_only": {
+        "targets": "EGFR, ERBB2",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "EGFR/ERBB inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    },
+    {
+      "cell_line_id": "CVCL_0459",
+      "drug": "Afatinib",
+      "condition": "[('Afatinib', 5.0, 'uM')]",
+      "perturbation_condition": "Afatinib | [('Afatinib', 5.0, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Afatinib",
+          "concentration": 5.0,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1722",
+        "smp_2284",
+        "smp_2680"
+      ],
+      "control_samples": [
+        "smp_1781",
+        "smp_1782",
+        "smp_2357",
+        "smp_2358",
+        "smp_2669",
+        "smp_2670"
+      ],
+      "matched_plates": [
+        "plate13",
+        "plate3",
+        "plate9"
+      ],
+      "treatment_sample_n": 3,
+      "control_sample_n": 6,
+      "treatment_cell_n": 11746,
+      "control_cell_n": 18517,
+      "mean_gene_count": 1181.335281768709,
+      "mean_pcnt_mito": 0.06777913954278239,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "NCI-H460",
+        "depmap_id": "ACH-000463",
+        "organ": "Lung"
+      },
+      "drug_annotations_context_only": {
+        "targets": "EGFR, ERBB2",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "EGFR/ERBB inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    },
+    {
+      "cell_line_id": "CVCL_0399",
+      "drug": "Afatinib",
+      "condition": "[('Afatinib', 0.05, 'uM')]",
+      "perturbation_condition": "Afatinib | [('Afatinib', 0.05, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Afatinib",
+          "concentration": 0.05,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1530",
+        "smp_2092",
+        "smp_2704"
+      ],
+      "control_samples": [
+        "smp_1589",
+        "smp_1590",
+        "smp_2165",
+        "smp_2166",
+        "smp_2669",
+        "smp_2670"
+      ],
+      "matched_plates": [
+        "plate1",
+        "plate13",
+        "plate7"
+      ],
+      "treatment_sample_n": 3,
+      "control_sample_n": 6,
+      "treatment_cell_n": 6343,
+      "control_cell_n": 13884,
+      "mean_gene_count": 1389.7628137777263,
+      "mean_pcnt_mito": 0.047745092064898964,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "LoVo",
+        "depmap_id": "ACH-000950",
+        "organ": "Bowel"
+      },
+      "drug_annotations_context_only": {
+        "targets": "EGFR, ERBB2",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "EGFR/ERBB inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    },
+    {
+      "cell_line_id": "CVCL_0459",
+      "drug": "Afatinib",
+      "condition": "[('Afatinib', 0.05, 'uM')]",
+      "perturbation_condition": "Afatinib | [('Afatinib', 0.05, 'uM')]",
+      "concentrations": [
+        {
+          "drug": "Afatinib",
+          "concentration": 0.05,
+          "unit": "uM"
+        }
+      ],
+      "treatment_samples": [
+        "smp_1530",
+        "smp_2092",
+        "smp_2704"
+      ],
+      "control_samples": [
+        "smp_1589",
+        "smp_1590",
+        "smp_2165",
+        "smp_2166",
+        "smp_2669",
+        "smp_2670"
+      ],
+      "matched_plates": [
+        "plate1",
+        "plate13",
+        "plate7"
+      ],
+      "treatment_sample_n": 3,
+      "control_sample_n": 6,
+      "treatment_cell_n": 10910,
+      "control_cell_n": 21900,
+      "mean_gene_count": 1069.2116259799766,
+      "mean_pcnt_mito": 0.053231729779962426,
+      "cell_count_source": "obs_metadata (full + minimal pass_filter)",
+      "biological_replication_established": false,
+      "cell_line_metadata": {
+        "cell_line_name": "NCI-H460",
+        "depmap_id": "ACH-000463",
+        "organ": "Lung"
+      },
+      "drug_annotations_context_only": {
+        "targets": "EGFR, ERBB2",
+        "moa_broad": "inhibitor/antagonist",
+        "moa_fine": "EGFR/ERBB inhibitor"
+      },
+      "coverage_note": "Treatment and control cell counts include full and minimal obs_metadata rows; expression-compatible full-only sample-line counts remain to be validated."
+    }
+  ],
+  "selected_cell_line_metadata": {
+    "CVCL_0399": {
+      "cell_line_name": "LoVo",
+      "depmap_id": "ACH-000950",
+      "organ": "Bowel"
+    },
+    "CVCL_0459": {
+      "cell_line_name": "NCI-H460",
+      "depmap_id": "ACH-000463",
+      "organ": "Lung"
+    }
+  },
+  "annotation_handling": "drug targets and MOA are contextual dataset annotations, including GPT-based curation; they are not treated as confirmed direct mechanisms in these assays."
+}

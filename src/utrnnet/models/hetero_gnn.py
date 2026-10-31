@@ -29,6 +29,7 @@ class TypedHeteroMessagePassingLayer(nn.Module):
         heads: int = 4,
         dropout: float = 0.1,
         allowed_edge_categories: tuple[str, ...] = EDGE_CATEGORIES,
+        use_evidence_tiers: bool = True,
     ) -> None:
         super().__init__()
         if hidden_channels % heads != 0:
@@ -36,6 +37,7 @@ class TypedHeteroMessagePassingLayer(nn.Module):
         self.hidden_channels = int(hidden_channels)
         self.heads = int(heads)
         self.allowed_edge_categories = set(allowed_edge_categories)
+        self.use_evidence_tiers = bool(use_evidence_tiers)
 
         self.evidence_emb = nn.Embedding(len(EVIDENCE_TIER_TO_ID) + 2, self.hidden_channels)
         self.edge_proj = nn.ModuleDict()
@@ -90,8 +92,17 @@ class TypedHeteroMessagePassingLayer(nn.Module):
             em = estore.edge_attr_missing_mask
             obs_e = (~em).to(ea.dtype)
             ea_clean = ea * obs_e
-            ev_ids = estore.evidence_tier_id.clamp(min=0, max=len(EVIDENCE_TIER_TO_ID) + 1)
-            ev_vec = self.evidence_emb(ev_ids)
+            if not self.use_evidence_tiers:
+                # Ablation mode: replace evidence_factor column with uniform 1.0 and zero evidence embedding
+                ea_clean = ea_clean.clone()
+                cat = getattr(estore, "edge_category", "")
+                if cat in EDGE_FEATURE_SCHEMAS and "evidence_factor" in EDGE_FEATURE_SCHEMAS[cat]:
+                    ev_col = EDGE_FEATURE_SCHEMAS[cat].index("evidence_factor")
+                    ea_clean[:, ev_col] = 1.0
+                ev_vec = torch.zeros((ei.shape[1], self.hidden_channels), dtype=ea.dtype, device=ea.device)
+            else:
+                ev_ids = estore.evidence_tier_id.clamp(min=0, max=len(EVIDENCE_TIER_TO_ID) + 1)
+                ev_vec = self.evidence_emb(ev_ids)
             edge_emb = self.edge_proj[ekey](torch.cat([ea_clean, obs_e, ev_vec], dim=-1))
 
             msg = self.convs[ekey]((z_dict[src_t], z_dict[dst_t]), ei, edge_attr=edge_emb)
@@ -182,6 +193,7 @@ class UTRNNetHeteroGNN(nn.Module):
         heads: int = 4,
         dropout: float = 0.1,
         allowed_edge_categories: tuple[str, ...] = EDGE_CATEGORIES,
+        use_evidence_tiers: bool = True,
     ) -> None:
         super().__init__()
         self.hidden_channels = int(hidden_channels)
@@ -189,6 +201,7 @@ class UTRNNetHeteroGNN(nn.Module):
         self.heads = int(heads)
         self.dropout = float(dropout)
         self.allowed_edge_categories = tuple(allowed_edge_categories)
+        self.use_evidence_tiers = bool(use_evidence_tiers)
 
         self.input_proj = nn.ModuleDict()
         self.decoders = nn.ModuleDict()
@@ -213,6 +226,7 @@ class UTRNNetHeteroGNN(nn.Module):
                     heads=self.heads,
                     dropout=self.dropout,
                     allowed_edge_categories=self.allowed_edge_categories,
+                    use_evidence_tiers=self.use_evidence_tiers,
                 )
                 for _ in range(self.num_layers)
             ]

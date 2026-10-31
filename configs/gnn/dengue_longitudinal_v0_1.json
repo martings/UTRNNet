@@ -1,0 +1,13 @@
+{
+  "contract": "dengue-paired-longitudinal/v0.1",
+  "timepoints": [
+    {"condition_label": "DF", "clinical_severity": "DF", "timepoint_label": "day_1_acute", "timepoint_order": 0},
+    {"condition_label": "DF_wk2", "clinical_severity": "DF", "timepoint_label": "week_2_convalescent", "timepoint_order": 1},
+    {"condition_label": "DHF", "clinical_severity": "DHF", "timepoint_label": "day_1_acute", "timepoint_order": 0},
+    {"condition_label": "DHF_wk2", "clinical_severity": "DHF", "timepoint_label": "week_2_convalescent", "timepoint_order": 1}
+  ],
+  "min_cells_per_population": 15,
+  "has_matched_single_cells": false,
+  "continuous_time_ode_allowed": false,
+  "cross_patient_or_severity_status": "exploratory"
+}

@@ -144,6 +144,8 @@ EVIDENCE_TIER_TO_ID: dict[str, int] = {
     "observed_reference": 8,
     "Sierra_UMI": 9,
     "curated_UMI": 10,
+    "expression_correlation": 11,
+    "curated_literature_and_correlation": 12,
 }
 
 ID_TO_EVIDENCE_TIER: dict[int, str] = {v: k for k, v in EVIDENCE_TIER_TO_ID.items()}
@@ -152,7 +154,9 @@ EVIDENCE_TIER_FACTORS: dict[str, float] = {
     "unknown": 0.0,
     "motif_heuristic": 0.25,
     "computational_prediction": 0.35,
+    "expression_correlation": 0.45,
     "external_database": 0.55,
+    "curated_literature_and_correlation": 0.65,
     "experimental_other_context": 0.75,
     "experimental_matching_context": 1.0,
     "sequence_or_import": 1.0,
