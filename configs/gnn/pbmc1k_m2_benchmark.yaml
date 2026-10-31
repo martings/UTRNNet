@@ -1,0 +1,43 @@
+# Reproducible GNN configuration for UTRNNet M1-M2 (cell-regulatory-state/v0.1)
+schema_version: cell-regulatory-state/v0.1
+experiment_name: pbmc1k_apa_masked_reconstruction_m2
+
+data:
+  cohort_dir: ${UTRNET_PBMC1K_OUTPUTS}
+  exploratory_seed_genes:
+    - ENSG00000130066  # SAT1
+    - ENSG00000172725  # CORO1B
+  min_pas_sites: 2
+  merge_graphs: false
+  population: null
+  strip_expression_from_candidate_edges: false
+
+model:
+  architecture: UTRNNetHeteroGNN
+  baseline: TrivialNonGraphBaseline
+  hidden_channels: 64
+  num_layers: 2
+  heads: 4
+  dropout: 0.1
+  allowed_edge_categories:
+    - structural
+    - annotation_derived
+    - observed
+    - inferred_candidate
+
+training:
+  seed: 42
+  hidden_channels: 64
+  num_layers: 2
+  heads: 4
+  dropout: 0.1
+  lr: 0.003
+  weight_decay: 0.0001
+  epochs: 40
+  mask_ratio: 0.25
+  device: auto
+
+evaluation:
+  negative_control: randomize_hetero_graph_edges
+  leakage_audit: true
+  temporal_modeling_enabled: false

@@ -1,6 +1,21 @@
-# scPolASeq-UTRNet
+# UTRNNet (UTR Regulatory Neural Network) & scPolASeq-UTRNet
+
+`UTRNNet` extends [`scpolaseq_utrnet`](https://github.com/martings/scpolaseq_utrnet) (initialized from upstream `main` commit `02997cb5a5e170200d1efeb42880050e3de8cfdd` with full Git history preserved and `upstream` configured as read-only) with a typed PyTorch Geometric heterogeneous regulatory graph adapter (`cell-regulatory-state/v0.1`), strict anti-leakage sanitization, and a two-layer heterogeneous message-passing encoder (`UTRNNetHeteroGNN`).
 
 `scpolaseq_utrnet` builds exploratory, population-specific 3′UTR regulatory graphs from frozen scPolASeq PAS counts. The PBMC 1k MVP uses the completed `pbmc_1k_v3` replica and its technically concordant downstream notebook output. It does not rerun alignment, Sierra, SCAPTURE, or PAS discovery.
+
+## UTRNNet (`utrnnet`) PyTorch Geometric Quick Start
+
+```bash
+python -m pip install -e '.[test,gnn]'
+utrnnet convert /path/to/outputs/pbmc1k/ENSG00000130066 -o /tmp/sat1_state.pt
+utrnnet benchmark --config configs/gnn/pbmc1k_m2_benchmark.yaml --output-dir /tmp/utrnnet_bench
+python -m pytest -q
+```
+
+See:
+- [Architecture & `cell-regulatory-state/v0.1` Data Contract](docs/architecture/CELL_REGULATORY_STATE_V0_1.md)
+- [M1–M2 Experiment Log, Metrics & Prioritized Backlog](docs/experiments/M1_M2_EXPERIMENT_REPORT_AND_BACKLOG.md)
 
 ## PBMC 1k quick start on Deepthought
 
