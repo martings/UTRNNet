@@ -1,0 +1,28 @@
+{
+  "contract": "cell-regulatory-state/v0.1",
+  "benchmark": "tahoe-100m-fixed-endpoint-delta/v0.1",
+  "source_dataset": "tahoebio/Tahoe-100M",
+  "source_revision": "349e2a55f5538a3e73b32a06c6bdd8e9e87011e8",
+  "selection_manifest": "data/tahoe/pilot_selection_manifest.json",
+  "selected_cell_lines": ["CVCL_0399", "CVCL_0459"],
+  "control_drug": "DMSO_TF",
+  "missing_modalities": ["PAS usage", "timepoint"],
+  "max_cache_bytes": 5242880,
+  "seed": 42,
+  "models": [
+    "zero_delta",
+    "ridge",
+    "regularized_mlp",
+    "gene_graph_gnn",
+    "regulatory_prior_hetero_gnn"
+  ],
+  "hyperparameters": {
+    "ridge_alpha": 1.0,
+    "latent_dim": 64,
+    "layers": 2,
+    "epochs": 60,
+    "lr": 0.005,
+    "top_k": 10,
+    "n_bootstrap": 200
+  }
+}

@@ -9,13 +9,27 @@ description = "Evidence-aware 3′UTR regulatory graphs from frozen scPolASeq ou
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
-dependencies = ["numpy>=1.24", "pandas>=2", "scipy>=1.10", "anndata>=0.10", "pysam>=0.22", "networkx>=3", "PyYAML>=6", "plotly>=5", "matplotlib>=3.7"]
+dependencies = [
+    "numpy>=1.24",
+    "pandas>=2",
+    "scipy>=1.10",
+    "anndata>=0.10",
+    "pysam>=0.22",
+    "networkx>=3",
+    "PyYAML>=6",
+    "plotly>=5",
+    "matplotlib>=3.7",
+    "torch>=2.0",
+    "torch-geometric>=2.4",
+]
 
 [project.optional-dependencies]
 test = ["pytest>=8"]
+gnn = ["torch>=2.0", "torch-geometric>=2.4"]
 
 [project.scripts]
 utrnet = "scpolaseq_utrnet.cli:main"
+utrnnet = "utrnnet.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

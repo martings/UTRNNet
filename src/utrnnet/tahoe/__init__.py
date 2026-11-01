@@ -1,0 +1,58 @@
+"""Tahoe-100M data adapter, sparse cache, resource tracker, and 4-model perturbation benchmark (`utrnnet.tahoe`)."""
+from .adapter import (
+    CONFIGS,
+    CONTROL_DRUG,
+    DATASET_ID,
+    DATASET_REVISION,
+    EXPRESSION_COLUMNS,
+    GENE_COLUMNS,
+    SAMPLE_COLUMNS,
+    expression_row_to_pairs,
+    make_gene_map,
+    parse_concentrations,
+    run_smoke_fixture,
+    sparse_counts,
+    sparse_resource_report,
+    validate_columns,
+    validate_group_partition,
+    write_sparse_cache,
+)
+from .benchmark import (
+    held_out_condition_mask,
+    response_metrics,
+    run_four_model_tahoe_benchmark,
+)
+from .models import (
+    GeneGraphDeltaPredictor,
+    RegularizedMLPDeltaPredictor,
+    RegulatoryPriorHeteroDeltaPredictor,
+    RidgeDeltaPredictor,
+    zero_delta,
+)
+
+__all__ = [
+    "CONFIGS",
+    "CONTROL_DRUG",
+    "DATASET_ID",
+    "DATASET_REVISION",
+    "EXPRESSION_COLUMNS",
+    "GENE_COLUMNS",
+    "GeneGraphDeltaPredictor",
+    "RegularizedMLPDeltaPredictor",
+    "RegulatoryPriorHeteroDeltaPredictor",
+    "RidgeDeltaPredictor",
+    "SAMPLE_COLUMNS",
+    "expression_row_to_pairs",
+    "held_out_condition_mask",
+    "make_gene_map",
+    "parse_concentrations",
+    "response_metrics",
+    "run_four_model_tahoe_benchmark",
+    "run_smoke_fixture",
+    "sparse_counts",
+    "sparse_resource_report",
+    "validate_columns",
+    "validate_group_partition",
+    "write_sparse_cache",
+    "zero_delta",
+]

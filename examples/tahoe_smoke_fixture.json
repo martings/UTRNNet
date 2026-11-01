@@ -1,0 +1,52 @@
+{
+  "dataset_id": "tahoebio/Tahoe-100M",
+  "source_revision": "349e2a55f5538a3e73b32a06c6bdd8e9e87011e8",
+  "purpose": "schema-only structural smoke fixture; not biological data",
+  "gene_metadata": [
+    {
+      "token_id": 101,
+      "gene_symbol": "GENE_A",
+      "ensembl_id": "ENSG00000000001"
+    },
+    {
+      "token_id": 102,
+      "gene_symbol": "GENE_B",
+      "ensembl_id": "ENSG00000000002"
+    }
+  ],
+  "expression_records": [
+    {
+      "genes": [
+        0,
+        101,
+        102
+      ],
+      "expressions": [
+        -2,
+        3,
+        1
+      ],
+      "drug": "compound-x",
+      "sample": "sample-x-r1",
+      "BARCODE_SUB_LIB_ID": "barcode1-lib1",
+      "cell_line_id": "CVCL_X",
+      "plate": "plate1"
+    },
+    {
+      "genes": [
+        0,
+        102
+      ],
+      "expressions": [
+        -2,
+        4
+      ],
+      "drug": "DMSO_TF",
+      "sample": "control-r1",
+      "BARCODE_SUB_LIB_ID": "barcode2-lib1",
+      "cell_line_id": "CVCL_X",
+      "plate": "plate1"
+    }
+  ],
+  "note": "The leading marker token and its sentinel expression are excluded; remaining values are synthetic integer counts."
+}
